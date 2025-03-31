@@ -9,6 +9,7 @@ public class ProductResponseDTO {
     private Long stock;
     private String imageUrl;
     private CategoryResponseDTO category;
+    private StoreResponseDTO store;
 
     public ProductResponseDTO() {
     }
@@ -20,6 +21,7 @@ public class ProductResponseDTO {
         this.stock = model.getStock();
         this.imageUrl = model.getImageUrl();
         this.category = new CategoryResponseDTO(model.getCategory());
+        this.store = new StoreResponseDTO(model.getStore());
     }
 
     public String getName() {
@@ -68,5 +70,13 @@ public class ProductResponseDTO {
 
     public void setCategoryId(CategoryResponseDTO categoryId) {
         this.category = categoryId;
+    }
+
+    public StoreResponseDTO getStore() {
+        return store;
+    }
+
+    public void setStore(StoreResponseDTO store) {
+        this.store = store;
     }
 }

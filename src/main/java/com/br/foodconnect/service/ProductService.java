@@ -5,8 +5,10 @@ import com.br.foodconnect.dto.ProductDTO;
 import com.br.foodconnect.dto.response.ProductResponseDTO;
 import com.br.foodconnect.model.CategoryModel;
 import com.br.foodconnect.model.ProductModel;
+import com.br.foodconnect.model.StoreModel;
 import com.br.foodconnect.repository.CategoryRepository;
 import com.br.foodconnect.repository.ProductRepository;
+import com.br.foodconnect.repository.StoreRepository;
 import com.br.foodconnect.util.BlobStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,10 +25,23 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private StoreRepository storeRepository;
+
+    @Autowired
     private BlobStorageUtil blobStorageUtil;
 
     public ResponseEntity<?> registerProduct(ProductDTO dto) throws Exception {
 
+        CategoryModel categoryModel = categoryRepository.findById(dto.getCategoryId()).orElse(null);
+        StoreModel storeModel = storeRepository.findById(dto.getStoreId()).orElse(null);
+
+        if (categoryModel == null && storeModel == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("A loja e a categoria fornecidas não existem!"));
+        } else if (categoryModel == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("Forneça uma categoria existente!"));
+        } else if (storeModel == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("Forneça uma loja existente!"));
+        }
         String imageUrl = null;
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
             imageUrl = blobStorageUtil.uploadImage(dto.getImage());
@@ -34,13 +49,7 @@ public class ProductService {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça a imagem do produto!"));
         }
 
-        CategoryModel categoryModel = categoryRepository.findById(dto.getCategoryId()).orElse(null);
-
-        if (categoryModel == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma categoria válida!"));
-        }
-
-        ProductModel productModel = new ProductModel(dto, categoryModel, imageUrl);
+        ProductModel productModel = new ProductModel(dto, categoryModel, storeModel, imageUrl);
         productModel = productRepository.save(productModel);
         ProductResponseDTO responseDTO = new ProductResponseDTO(productModel);
 

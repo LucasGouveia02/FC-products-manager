@@ -32,7 +32,14 @@ public class ProductService {
 
     public ResponseEntity<?> registerProduct(ProductDTO dto) throws Exception {
 
-        CategoryModel categoryModel = categoryRepository.findById(dto.getCategoryId()).orElse(null);
+        if (dto.getCategory() == null || dto.getCategory().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma categoria!"));
+        }
+
+        if (dto.getStoreId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma loja!"));
+        }
+        CategoryModel categoryModel = categoryRepository.findByName(dto.getCategory());
         StoreModel storeModel = storeRepository.findById(dto.getStoreId()).orElse(null);
 
         if (categoryModel == null && storeModel == null) {

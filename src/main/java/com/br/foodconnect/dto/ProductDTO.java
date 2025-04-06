@@ -8,7 +8,7 @@ public class ProductDTO {
     private String description;
     private Double price;
     private Long stock;
-    private Long categoryId;
+    private String category;
     private Long storeId;
     @JsonIgnore
     private MultipartFile image;
@@ -48,12 +48,12 @@ public class ProductDTO {
         this.stock = stock;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(String category) {
+        this.category = category;
     }
 
     public MultipartFile getImage() {

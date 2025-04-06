@@ -35,6 +35,7 @@ public class ProductModel {
     private String imageUrl;
     @Column(nullable = false)
     private Long stock;
+    private Boolean isEnabled;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_category_id")
@@ -102,6 +103,14 @@ public class ProductModel {
 
     public void setStock(Long stock) {
         this.stock = stock;
+    }
+
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
     }
 
     public CategoryModel getCategory() {

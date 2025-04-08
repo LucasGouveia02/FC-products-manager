@@ -16,3 +16,4 @@ spring:
 
 server:
   port: ${PORT:8084}
+  address: 0.0.0.0

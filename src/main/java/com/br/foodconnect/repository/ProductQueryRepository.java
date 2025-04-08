@@ -1,6 +1,5 @@
 package com.br.foodconnect.repository;
 
-import com.br.foodconnect.dto.ProductDTO;
 import com.br.foodconnect.model.ProductModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +15,8 @@ public interface ProductQueryRepository extends JpaRepository<ProductModel, Long
             p.name AS product_name,
             p.image_url AS product_image,
             c.name AS category_name,
-            GROUP_CONCAT(DISTINCT s.food_court ORDER BY s.food_court SEPARATOR ', ') AS available_in_food_courts
+            GROUP_CONCAT(DISTINCT s.food_court ORDER BY s.food_court SEPARATOR ', ') AS available_in_food_courts,
+            GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS available_in_stores
         FROM product p
         JOIN category c ON p.product_category_id = c.id
         JOIN store s ON p.store_id = s.id

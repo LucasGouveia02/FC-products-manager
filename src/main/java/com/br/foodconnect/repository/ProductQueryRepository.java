@@ -55,4 +55,15 @@ public interface ProductQueryRepository extends JpaRepository<ProductModel, Long
     """, nativeQuery = true)
     List<Map<String, Object>> findProductByStoreAndCategory(@Param("storeId") Long storeId,
                                                             @Param("category") String category);
+
+    @Query(value = """
+        SELECT 
+            s.food_court AS foodCourt,
+            s.name AS storeName,
+            s.id AS storeId
+        FROM product p
+        JOIN store s ON p.store_id = s.id
+        WHERE p.name = :productName
+    """, nativeQuery = true)
+    List<Map<String, Object>> findStoresGroupedByFoodCourtByProductName(@Param("productName") String productName);
 }

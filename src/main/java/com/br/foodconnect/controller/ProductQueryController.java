@@ -30,4 +30,9 @@ public class ProductQueryController {
                                                            @RequestParam String category) {
         return productQueryService.listProductByStoreAndCategory(storeId, category);
     }
+
+    @GetMapping("/storesGroupedByFoodCourt")
+    public List<Map<String, Object>> listStoresGroupedByFoodCourt(@RequestParam String productName) {
+        return productQueryService.listStoresGroupedByFoodCourtByProductName(productName);
+    }
 }

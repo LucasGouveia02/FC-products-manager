@@ -24,4 +24,8 @@ public class ProductQueryService {
     public List<Map<String, Object>> listProductByStoreAndCategory(Long storeId, String category) {
         return productQueryRepository.findProductByStoreAndCategory(storeId, category);
     }
+
+    public List<Map<String, Object>> listStoresGroupedByFoodCourtByProductName(String productName) {
+        return productQueryRepository.findStoresGroupedByFoodCourtByProductName(productName);
+    }
 }

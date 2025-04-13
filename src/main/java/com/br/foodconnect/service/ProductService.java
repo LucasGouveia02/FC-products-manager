@@ -85,4 +85,73 @@ public class ProductService {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<?> listProductById(Long id) {
+        ProductModel productModel = productRepository.findById(id).orElse(null);
+        if (productModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO("Produto não encontrado!"));
+        }
+        ProductResponseDTO responseDTO = new ProductResponseDTO(productModel);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updateProduct(ProductDTO dto, Long id) throws Exception {
+        if (dto.getCategory() == null || dto.getCategory().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma categoria!"));
+        }
+
+        CategoryModel categoryModel = categoryRepository.findByName(dto.getCategory());
+
+        if (categoryModel == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("Forneça uma categoria existente!"));
+        }
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça o ID do produto!"));
+        }
+
+        ProductModel productModel = productRepository.findById(id).orElse(null);
+        if (productModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO("Produto não encontrado!"));
+        }
+
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            String imageUrl = blobStorageUtil.uploadImage(dto.getImage());
+            productModel.setImageUrl(imageUrl);
+        }
+        productModel.setCategory(categoryModel);
+        productModel.setName(dto.getName());
+        productModel.setDescription(dto.getDescription());
+        productModel.setPrice(dto.getPrice());
+        productModel.setStock(dto.getStock());
+        productModel = productRepository.save(productModel);
+        ProductResponseDTO responseDTO = new ProductResponseDTO(productModel);
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> enableProduct(Long id) {
+        ProductModel productModel = productRepository.findById(id).orElse(null);
+        if (productModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO("Produto não encontrado!"));
+        }
+        productModel.setEnabled(true);
+
+        productModel = productRepository.save(productModel);
+        ProductResponseDTO responseDTO = new ProductResponseDTO(productModel);
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> disableProduct(Long id) {
+        ProductModel productModel = productRepository.findById(id).orElse(null);
+        if (productModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO("Produto não encontrado!"));
+        }
+        productModel.setEnabled(false);
+
+        productModel = productRepository.save(productModel);
+        ProductResponseDTO responseDTO = new ProductResponseDTO(productModel);
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
 }

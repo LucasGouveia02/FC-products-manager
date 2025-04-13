@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -36,5 +38,32 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
                 @RequestParam(defaultValue = "10") int size) {
         return productService.listProducts(page, size);
+    }
+
+    @GetMapping("/listById")
+    public ResponseEntity<?> listarProdutoPorId(
+            @RequestParam("id") Long id) {
+        return productService.listProductById(id);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateProduct(
+            @RequestPart("product") ProductDTO dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestParam("id") Long id) throws Exception {
+        dto.setImage(image);
+        return productService.updateProduct(dto, id);
+    }
+
+    @PatchMapping("/enable")
+    public ResponseEntity<?> enableProduct(
+            @RequestParam("id") Long id) {
+        return productService.enableProduct(id);
+    }
+
+    @PatchMapping("/disable")
+    public ResponseEntity<?> disableProduct(
+            @RequestParam("id") Long id) {
+        return productService.disableProduct(id);
     }
 }

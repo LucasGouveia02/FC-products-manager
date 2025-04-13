@@ -73,9 +73,9 @@ public class ProductService {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Map<String, Object>> listProducts(int page, int size) {
+    public ResponseEntity<Map<String, Object>> listProducts(int page, int size, Long storeId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<ProductModel> produtoPage = productRepository.findAll(pageable);
+        Page<ProductModel> produtoPage = productRepository.findAllByStoreId(pageable, storeId);
         List<ProductResponseDTO> produtos = produtoPage.stream()
                 .map(ProductResponseDTO::new)
                 .collect(Collectors.toList());

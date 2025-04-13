@@ -36,8 +36,9 @@ public class ProductController {
     @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> listarProdutos(
             @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "10") int size) {
-        return productService.listProducts(page, size);
+                @RequestParam(defaultValue = "10") int size,
+            @RequestParam("storeId") Long storeId) {
+        return productService.listProducts(page, size, storeId);
     }
 
     @GetMapping("/listById")

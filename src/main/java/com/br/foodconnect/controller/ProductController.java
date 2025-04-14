@@ -34,7 +34,7 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> listarProdutos(
+    public ResponseEntity<?> listarProdutos(
             @RequestParam(defaultValue = "0") int page,
                 @RequestParam(defaultValue = "10") int size,
             @RequestParam("storeId") Long storeId) {
@@ -45,6 +45,15 @@ public class ProductController {
     public ResponseEntity<?> listarProdutoPorId(
             @RequestParam("id") Long id) {
         return productService.listProductById(id);
+    }
+
+    @GetMapping("/listByNameAndStoreId")
+    public ResponseEntity<?> listarProdutoPorNomeEStoreId(
+            @RequestParam("name") String nome,
+            @RequestParam("storeId") Long storeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return productService.listProductByNameAndStoreId(nome, storeId, page, size);
     }
 
     @PutMapping("/update")

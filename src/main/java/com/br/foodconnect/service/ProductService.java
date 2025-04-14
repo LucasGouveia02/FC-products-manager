@@ -73,9 +73,36 @@ public class ProductService {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Map<String, Object>> listProducts(int page, int size, Long storeId) {
+    public ResponseEntity<?> listProducts(int page, int size, Long storeId) {
+        if (storeId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma loja!"));
+        }
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<ProductModel> produtoPage = productRepository.findAllByStoreId(pageable, storeId);
+        List<ProductResponseDTO> produtos = produtoPage.stream()
+                .map(ProductResponseDTO::new)
+                .collect(Collectors.toList());
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", produtos);
+        response.put("totalPages", produtoPage.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> listProductByNameAndStoreId(String nome, Long storeId, int page, int size) {
+        if (storeId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO("Forneça uma loja!"));
+        }
+
+        StoreModel storeModel = storeRepository.findById(storeId).orElse(null);
+        if (storeModel == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO("Forneça uma loja existente!"));
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<ProductModel> produtoPage = productRepository.findAllByNameAndStoreId(nome, storeModel, pageable);
+        if (produtoPage.getContent().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO("Produto não encontrado!"));
+        }
         List<ProductResponseDTO> produtos = produtoPage.stream()
                 .map(ProductResponseDTO::new)
                 .collect(Collectors.toList());

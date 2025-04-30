@@ -2,7 +2,7 @@ name: Deploy to Azure VM
 
 on:
   push:
-    branches: [ "main" ]  # Ou outra branch de sua escolha
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -22,12 +22,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
             set -e
             cd /home/FoodConnect/foodconnect-backend/products-manager &&
+
+            # Atualizar o repositório do Products Manager
             git pull origin main &&
-            chmod +x ./mvnw &&
-            ./mvnw clean package -DskipTests &&
-            docker stop foodconnect-products-manager-1 || true &&
-            docker rm -f foodconnect-products-manager-1 || true &&
-            docker rmi -f foodconnect-products-manager || true &&
-            docker build -t foodconnect-products-manager . &&
-            docker run -d -p 8084:8084 --name foodconnect-products-manager-1 foodconnect-products-manager
+            
+            # Rodar o Docker Compose (ele pode reconstruir e atualizar as outras APIs também)
+            cd .. &&
+            docker-compose down || true &&
+            docker-compose up -d --build
           "

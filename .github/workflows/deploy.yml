@@ -20,14 +20,18 @@ jobs:
 
       - name: Envia projeto products-manager para a VM
         run: |
+          # Conecta à VM, limpa o diretório de destino e cria o novo diretório
           ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
             rm -rf ~/foodconnect-backend/products-manager &&
             mkdir -p ~/foodconnect-backend/products-manager"
-          scp -r ./foodconnect-backend/products-manager/* FoodConnect@4.201.144.173:~/foodconnect-backend/products-manager
+          
+          # Envia o conteúdo da pasta de backend do repositório para a VM
+          scp -r ./foodconnect-backend/* FoodConnect@4.201.144.173:~/foodconnect-backend/products-manager
 
       - name: Builda e sobe o container na VM
         run: |
+          # Conecta à VM, entra no diretório do projeto e executa os comandos do Docker
           ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
-            cd ~/foodconnect-backend &&
-            docker compose build products-manager &&
-            docker compose up -d products-manager"
+            cd ~/foodconnect-backend/products-manager &&
+            docker compose build &&
+            docker compose up -d"

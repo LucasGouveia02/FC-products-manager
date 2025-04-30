@@ -1,0 +1,33 @@
+name: Deploy Product Manager
+
+on:
+  push:
+    branches:
+      - main  # ou sua branch de deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Adiciona chave SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+
+      - name: Envia projeto products-manager para a VM
+        run: |
+          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
+            rm -rf ~/foodconnect-backend/products-manager &&
+            mkdir -p ~/foodconnect-backend/products-manager"
+          scp -r ./foodconnect-backend/products-manager/* FoodConnect@4.201.144.173:~/foodconnect-backend/products-manager
+
+      - name: Builda e sobe o container na VM
+        run: |
+          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
+            cd ~/foodconnect-backend &&
+            docker compose build products-manager &&
+            docker compose up -d products-manager"

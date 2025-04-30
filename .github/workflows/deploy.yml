@@ -23,6 +23,7 @@ jobs:
             set -e
             cd /home/FoodConnect/foodconnect-backend/products-manager &&
             git pull origin main &&
+            chmod +x ./mvnw &&
             ./mvnw clean package -DskipTests &&
             docker stop foodconnect-products-manager-1 || true &&
             docker rm -f foodconnect-products-manager-1 || true &&

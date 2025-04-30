@@ -2,28 +2,30 @@ name: Deploy to Azure VM
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]  # Ou a branch que você quiser monitorar
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH access
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy via SSH
+      - name: Copy files to server
         run: |
-          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 << 'EOF'
-            cd /home/FoodConnect/foodconnect-backend/products-manager
-            git pull origin main
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d --build
-          EOF
+          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
+            cd /home/FoodConnect/foodconnect-backend/products-manager &&
+            git pull origin main &&
+            ./mvnw clean package -DskipTests &&
+            docker stop foodconnect-products-manager-1 || true &&
+            docker rm foodconnect-products-manager-1 || true &&
+            docker rmi foodconnect-products-manager || true &&
+            docker build -t foodconnect-products-manager . &&
+            docker run -d -p 8084:8084 --name foodconnect-products-manager-1 foodconnect-products-manager
+          "

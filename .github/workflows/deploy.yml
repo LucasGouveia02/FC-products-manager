@@ -1,37 +1,41 @@
-name: Deploy Product Manager
+name: Deploy to FoodConnect Server
 
 on:
   push:
     branches:
-      - main  # ou sua branch de deploy
+      - main  # ou a branch que você deseja usar
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      # Checkout do código
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Adiciona chave SSH
+      # Configuração do SSH Agent (para autenticação na VM)
+      - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Envia projeto products-manager para a VM
+      # Listar os arquivos antes de fazer o deploy (opcional, para depuração)
+      - name: List files to deploy
         run: |
-          # Conecta à VM, limpa o diretório de destino e cria o novo diretório
-          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
-            rm -rf ~/foodconnect-backend/products-manager &&
-            mkdir -p ~/foodconnect-backend/products-manager"
-          
-          # Envia o conteúdo da pasta de backend do repositório para a VM
-          scp -r ./foodconnect-backend/* FoodConnect@4.201.144.173:~/foodconnect-backend/products-manager
+          ls -R ./foodconnect-backend/products-manager
 
-      - name: Builda e sobe o container na VM
+      # Enviar os arquivos via SCP
+      - name: Deploy via SCP
         run: |
-          # Conecta à VM, entra no diretório do projeto e executa os comandos do Docker
-          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 "
-            cd ~/foodconnect-backend/products-manager &&
-            docker compose build &&
-            docker compose up -d"
+          scp -r ./foodconnect-backend/products-manager/* FoodConnect@4.201.144.173:/home/FoodConnect/foodconnect-backend/products-manager
+
+      # Conectar via SSH e reiniciar a aplicação (opcional)
+      - name: SSH into server and restart the application
+        run: |
+          ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 << 'EOF'
+            cd /home/FoodConnect/foodconnect-backend
+            # Comando para reiniciar o serviço da aplicação (ajuste conforme necessário)
+            docker-compose down
+            docker-compose up -d
+          EOF

@@ -1,41 +1,29 @@
-name: Deploy to FoodConnect Server
+name: Deploy to Azure VM
 
 on:
   push:
     branches:
-      - main  # ou a branch que você deseja usar
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout do código
-      - name: Checkout code
+      - name: Check out the repo
         uses: actions/checkout@v3
 
-      # Configuração do SSH Agent (para autenticação na VM)
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Set up SSH access
+        uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Listar os arquivos antes de fazer o deploy (opcional, para depuração)
-      - name: List files to deploy
-        run: |
-          ls -R ./foodconnect-backend/products-manager
-
-      # Enviar os arquivos via SCP
-      - name: Deploy via SCP
-        run: |
-          scp -r ./foodconnect-backend/products-manager/* FoodConnect@4.201.144.173:/home/FoodConnect/foodconnect-backend/products-manager
-
-      # Conectar via SSH e reiniciar a aplicação (opcional)
-      - name: SSH into server and restart the application
+      - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no FoodConnect@4.201.144.173 << 'EOF'
-            cd /home/FoodConnect/foodconnect-backend
-            # Comando para reiniciar o serviço da aplicação (ajuste conforme necessário)
+            cd /home/FoodConnect/foodconnect-backend/products-manager
+            git pull origin main
             docker-compose down
-            docker-compose up -d
+            docker-compose pull
+            docker-compose up -d --build
           EOF

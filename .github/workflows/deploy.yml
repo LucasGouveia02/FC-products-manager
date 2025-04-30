@@ -25,9 +25,20 @@ jobs:
 
             # Atualizar o repositório do Products Manager
             git pull origin main &&
-            
-            # Rodar o Docker Compose (ele pode reconstruir e atualizar as outras APIs também)
+
+            # Voltar para a raiz do projeto Docker
             cd .. &&
-            docker-compose down || true &&
-            docker-compose up -d --build
+
+            # Parar e remover containers existentes
+            docker-compose down || true
+
+            # Remover imagens órfãs ou corrompidas (se houver)
+            docker image prune -af || true
+
+            # Remover volumes não utilizados (evita conflitos com mounts antigos)
+            docker volume prune -f || true
+
+            # Rebuild completo e subir tudo novamente
+            docker-compose build --no-cache
+            docker-compose up -d
           "

@@ -9,11 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import static com.br.foodconnect.util.Utils.arredondarParaDuasCasasDecimais;
 
@@ -35,20 +31,26 @@ public class ProductModel {
     private String imageUrl;
     @Column(nullable = false)
     private Long stock;
+    private Boolean isEnabled;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_category_id")
     private CategoryModel category;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private StoreModel store;
 
     public ProductModel() {
     }
 
-    public ProductModel(ProductDTO dto, CategoryModel category, String imageUrl) {
+    public ProductModel(ProductDTO dto, CategoryModel category, StoreModel store, String imageUrl) {
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.stock = dto.getStock();
         this.price = arredondarParaDuasCasasDecimais(dto.getPrice());
         this.category = category;
+        this.store = store;
         this.imageUrl = imageUrl;
     }
     public void setPrice(double price) {
@@ -99,11 +101,27 @@ public class ProductModel {
         this.stock = stock;
     }
 
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public CategoryModel getCategory() {
         return category;
     }
 
     public void setCategory(CategoryModel category) {
         this.category = category;
+    }
+
+    public StoreModel getStore() {
+        return store;
+    }
+
+    public void setStore(StoreModel store) {
+        this.store = store;
     }
 }

@@ -3,7 +3,6 @@ package com.br.foodconnect.util;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobClientBuilder;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +14,7 @@ import java.nio.file.Paths;
 public class BlobStorageUtil {
 
     Dotenv dotenv = Dotenv.configure()
-            .directory("env/local")
+            .directory("env/cloud")
             .filename("env.conf")
             .load();
 

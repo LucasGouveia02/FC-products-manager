@@ -33,8 +33,12 @@ public interface ProductQueryRepository extends JpaRepository<ProductModel, Long
             p.price, 
             p.image_url, 
             p.stock, 
-            p.product_category_id
+            p.product_category_id,
+            c.expected_delivery_time,
+            c.name AS category_name
         FROM product p
+        LEFT JOIN category c
+        ON p.product_category_id = c.id
         WHERE p.store_id = :storeId
     """, nativeQuery = true)
     List<Map<String, Object>> findProductByStore(@Param("storeId") Long storeId);

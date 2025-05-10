@@ -13,6 +13,8 @@ spring:
     properties:
       hibernate:
         dialect: ${DB_DIALECT}
+        jdbc:
+          time_zone: America/Sao_Paulo
 
 server:
   port: ${PORT:8084}

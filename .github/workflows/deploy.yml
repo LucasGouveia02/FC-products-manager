@@ -70,6 +70,7 @@ jobs:
 
             echo "Atualizando imagem no docker-compose e subindo..."
             docker tag $TEST_IMAGE $SERVICE_NAME
+            docker image prune -f
             docker rmi $TEST_IMAGE || true
 
             docker compose up -d --no-deps --build $SERVICE_NAME
